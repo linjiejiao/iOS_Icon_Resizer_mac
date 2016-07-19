@@ -79,6 +79,7 @@
     }
     BOOL isDir;
     BOOL dirExit = [[NSFileManager defaultManager] fileExistsAtPath:outputDir isDirectory:&isDir];
+    // check destination directories and create
     if(!dirExit || !isDir){
         NSError *err;
         [[NSFileManager defaultManager] createDirectoryAtPath:outputDir withIntermediateDirectories:YES attributes:nil error:&err];
@@ -88,6 +89,7 @@
         }
     }
     NSArray *images = [dic objectForKey:@"images"];
+    // scale the provided image to all sizes in Contents.json
     for(int i=0; i<images.count; i++){
         NSDictionary *image = images[i];
         NSString *newName = [NSString stringWithFormat:@"%@-%d.png", fileName, i];
@@ -101,11 +103,13 @@
         [self scalesImageAtPath:imgPath outputPath:output outputSize:nsSize];
         [self addStringInfo:output];
     }
+    // write the updated Contents.json to destination directory
     NSString *sontentPath = [NSString stringWithFormat:@"%@/Contents.json", outputDir];
     [dic writeToFile:sontentPath atomically:YES];
     [self addStringInfo:sontentPath];
 }
 
+/// scale a single image
 - (BOOL)scalesImageAtPath:(NSString *)sourcePath outputPath:(NSString*)optPath outputSize:(NSSize)optSize {
     NSImage *image = [[NSImage alloc]initWithContentsOfFile:sourcePath];
     [image setSize:optSize];
@@ -118,6 +122,7 @@
     return [imageData writeToFile:optPath atomically:YES];
 }
 
+/// parse Contents.json, get size parmeters
 - (void)parseSezes {
     NSString *path = [[NSBundle mainBundle] pathForResource:@"Contents" ofType:@"json"];
     NSData * data = [[NSFileManager defaultManager] contentsAtPath:path];
@@ -125,6 +130,7 @@
     self.contentsJson = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error];
 }
 
+/// print output infos on UI
 - (void)addStringInfo:(NSString*)string {
     NSString *origin = self.outputInfoText.string;
     if(!origin){
