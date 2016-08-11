@@ -103,9 +103,10 @@
         [self scalesImageAtPath:imgPath outputPath:output outputSize:nsSize];
         [self addStringInfo:output];
     }
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dic options:NSJSONWritingPrettyPrinted error:nil];
     // write the updated Contents.json to destination directory
     NSString *sontentPath = [NSString stringWithFormat:@"%@/Contents.json", outputDir];
-    [dic writeToFile:sontentPath atomically:YES];
+    [jsonData writeToFile:sontentPath atomically:YES];
     [self addStringInfo:sontentPath];
 }
 
